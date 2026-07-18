@@ -3,19 +3,39 @@ const shortHash = require("short-hash");
 const lodash = require("lodash");
 const getObjectKey = require("./utils/getObjectKey.js");
 const calc = require("./utils/calc.js");
+const Sparkline = require('./utils/sparkline.js');
 
-function hasUrl(urls, requestedUrl) {
+function isUrlMatch(haystackUrls, needleUrl) {
+	if(!Array.isArray(haystackUrls) || haystackUrls.length === 0) {
+		return false;
+	}
+
+	if(needleUrl && typeof needleUrl === "string") {
+		// TODO lowercase just the origins
+		needleUrl = needleUrl.toLowerCase();
+		if(haystackUrls.indexOf(needleUrl) > -1 || needleUrl.endsWith("/") && haystackUrls.indexOf(needleUrl.substr(0, needleUrl.length - 1)) > -1) {
+			return true;
+		}
+	}
+	return false;
+}
+
+function hasUrl(urls, { url, requestedUrl }, skipUrls = []) {
 	// urls comes from sites[vertical].urls, all requestedUrls (may not include trailing slash)
 
 	// TODO lowercase just the origins
-	let lowercaseUrls = urls.map(url => url.toLowerCase());
+	let lowercaseUrls = urls.map(targetUrl => targetUrl.toLowerCase());
 
-	if(requestedUrl && typeof requestedUrl === "string") {
-		// TODO lowercase just the origins
-		requestedUrl = requestedUrl.toLowerCase();
-		if(lowercaseUrls.indexOf(requestedUrl) > -1 || requestedUrl.endsWith("/") && lowercaseUrls.indexOf(requestedUrl.substr(0, requestedUrl.length - 1)) > -1) {
-			return true;
-		}
+	if(isUrlMatch(skipUrls, requestedUrl) || isUrlMatch(skipUrls, url)) {
+		return false;
+	}
+
+	// Requested url matches?
+	if(isUrlMatch(lowercaseUrls, requestedUrl)) {
+		return true;
+	}
+	if(isUrlMatch(lowercaseUrls, url)) {
+		return true;
 	}
 
 	return false;
@@ -64,6 +84,9 @@ function getLighthouseTotal(entry) {
 
 module.exports = function(eleventyConfig) {
 	eleventyConfig.addFilter("shortHash", shortHash);
+	eleventyConfig.setServerOptions({
+		domDiff: false
+	});
 
 	eleventyConfig.addFilter("repeat", function(str, times) {
 		let result = '';
@@ -188,7 +211,7 @@ module.exports = function(eleventyConfig) {
 
 	eleventyConfig.addFilter("getObjectKey", getObjectKey);
 
-	function filterResultsToUrls(obj, urls = [], skipKeys = []) {
+	function filterResultsToUrls(obj, urls = [], skipKeys = [], skipUrls = []) {
 		let arr = [];
 		for(let key in obj) {
 			if(skipKeys.indexOf(key) > -1) {
@@ -199,7 +222,7 @@ module.exports = function(eleventyConfig) {
 			let newestFilename = Object.keys(obj[key]).sort().pop();
 			result = obj[key][newestFilename];
 			// urls comes from sites[vertical].urls, all requestedUrls (may not include trailing slash)
-			if(urls === true || result && hasUrl(urls, result.requestedUrl)) {
+			if(urls === true || result && hasUrl(urls, result, skipUrls)) {
 				arr.push(obj[key]);
 			}
 		}
@@ -208,9 +231,10 @@ module.exports = function(eleventyConfig) {
 
 	eleventyConfig.addFilter("getSites", (results, sites, vertical, skipKeys = []) => {
 		let urls = sites[vertical].urls;
+		let skipUrls = sites[vertical].skipUrls;
 		let isIsolated = sites[vertical].options && sites[vertical].options.isolated === true;
 		let prunedResults = isIsolated ? results[vertical] : results;
-		return filterResultsToUrls(prunedResults, urls, skipKeys);
+		return filterResultsToUrls(prunedResults, urls, skipKeys, skipUrls);
 	});
 
 	// Deprecated, use `getSites` instead, it works with isolated categories
@@ -297,13 +321,13 @@ module.exports = function(eleventyConfig) {
 
 	eleventyConfig.addFilter("calc", calc);
 
-	function getWeeklyServiceCacheBuster() {
-		let d = new Date();
-		// Weekly
-		return `_${d.getFullYear()}${pad(d.getMonth()+1)}_${d.getDate() % 7}`;
-	}
 	eleventyConfig.addFilter("generatorImageUrl", (url) => {
-		return `https://v1.generator.11ty.dev/image/${encodeURIComponent(url)}/${getWeeklyServiceCacheBuster()}/`;
+		return `https://v1.generator.11ty.dev/image/${encodeURIComponent(url)}/`;
+	});
+
+	eleventyConfig.addFilter("hostingImageUrl", (url) => {
+		// return `https://v1--eleventy-api-built-with.netlify.app/${encodeURIComponent(url)}/image/host/`;
+		return `https://v1.builtwith.11ty.dev/${encodeURIComponent(url)}/image/host/`;
 	});
 
 	eleventyConfig.addPairedShortcode("starterMessage", (htmlContent) => {
@@ -325,4 +349,45 @@ module.exports = function(eleventyConfig) {
 		ui: false,
 		ghostMode: false
 	});
+	eleventyConfig.addShortcode('lighthouseSparkline', (site) => {
+		const timeSeries = Object.values(site).sort(
+			(a, b) => a.timestamp - b.timestamp
+		);
+		const values = timeSeries.map((run) => run.lighthouse?.total || 0);
+		return Sparkline({
+			// red-orange-green gradient similar to usage in <speedlify-score>
+			gradient: [
+				{ color: '#ff4e42', offset: '0%' },
+				{ color: '#ff4e42', offset: '30%' },
+				{ color: '#ffa400', offset: '70%' },
+				{ color: '#ffa400', offset: '85%' },
+				{ color: '#0cce6b', offset: '95%' },
+				{ color: '#0cce6b', offset: '100%' },
+			],
+			values,
+			min: 0,
+			max: 400,
+			timeSeries,
+		});
+	});
+
+	eleventyConfig.addShortcode('weightSparkline', (site) => {
+		const timeSeries = Object.values(site).sort(
+			(a, b) => a.timestamp - b.timestamp
+		);
+		const values = timeSeries.map((run) => run.weight?.total || 0);
+		return Sparkline({
+			color: '#d151ff',
+			values,
+			min: 0,
+			timeSeries,
+			// Display raw bytes as pretty values on y axis, e.g. 49244 => 48K
+			formatAxis: (num) => {
+				const { value, unit } = byteSize(num, { units: 'iec', precision: 0 });
+				return value === '0' ? value : value + unit.slice(0, 1);
+			},
+		});
+	});
+
+	eleventyConfig.setWatchJavaScriptDependencies(false);
 };
