@@ -1,0 +1,67 @@
+{
+  "url": "https://www.aaron-gustafson.com/notebook/",
+  "requestedUrl": "https://www.aaron-gustafson.com/notebook/",
+  "timestamp": 1703493151163,
+  "ranks": {
+    "hundos": 1,
+    "performance": 4,
+    "accessibility": 1,
+    "cumulative": 1
+  },
+  "lighthouse": {
+    "version": "9.6.8",
+    "performance": 1,
+    "accessibility": 1,
+    "bestPractices": 1,
+    "seo": 0.99,
+    "total": 399
+  },
+  "firstContentfulPaint": 1062.1772,
+  "firstMeaningfulPaint": 1062.1772,
+  "speedIndex": 1062.1772,
+  "largestContentfulPaint": 1062.1772,
+  "totalBlockingTime": 0,
+  "cumulativeLayoutShift": 0,
+  "timeToInteractive": 1062.1772,
+  "maxPotentialFirstInputDelay": 16,
+  "timeToFirstByte": 135.214,
+  "weight": {
+    "summary": "8 requests • 67 KiB",
+    "total": 68310,
+    "image": 39103,
+    "imageCount": 4,
+    "script": 1719,
+    "scriptCount": 1,
+    "document": 7367,
+    "font": 0,
+    "fontCount": 0,
+    "stylesheet": 20121,
+    "stylesheetCount": 2,
+    "thirdParty": 39103,
+    "thirdPartyCount": 4
+  },
+  "run": {
+    "number": 1,
+    "total": 3
+  },
+  "sidequests": {
+    "-weight.total": 7,
+    "+weight.total": 2,
+    "-weight.document": 3,
+    "+weight.document": 6,
+    "-weight.script": 2,
+    "+weight.script": 6,
+    "-weight.image": 4,
+    "+weight.image": 2,
+    "-weight.font": 1,
+    "+weight.font": 1,
+    "+weight.fontCount": 1,
+    "-timeToFirstByte": 7,
+    "-totalBlockingTime": 1,
+    "-largestContentfulPaint": 4
+  },
+  "axe": {
+    "passes": 418,
+    "violations": 0
+  }
+}

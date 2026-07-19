@@ -1,0 +1,67 @@
+{
+  "url": "https://www.aaron-gustafson.com/speaking-engagements/",
+  "requestedUrl": "https://www.aaron-gustafson.com/speaking-engagements/",
+  "timestamp": 1750059389232,
+  "ranks": {
+    "hundos": 7,
+    "performance": 7,
+    "accessibility": 8,
+    "cumulative": 8
+  },
+  "lighthouse": {
+    "version": "9.6.8",
+    "performance": 0.81,
+    "accessibility": 0.95,
+    "bestPractices": 1,
+    "seo": 1,
+    "total": 376
+  },
+  "firstContentfulPaint": 1005.7887999999999,
+  "firstMeaningfulPaint": 1005.7887999999999,
+  "speedIndex": 1005.7887999999999,
+  "largestContentfulPaint": 1005.7887999999999,
+  "totalBlockingTime": 246.9999999999999,
+  "cumulativeLayoutShift": 1,
+  "timeToInteractive": 1796.9667499999998,
+  "maxPotentialFirstInputDelay": 214.9999999999999,
+  "timeToFirstByte": 37.217,
+  "weight": {
+    "summary": "64 requests • 1,232 KiB",
+    "total": 1261206,
+    "image": 1221184,
+    "imageCount": 57,
+    "script": 4118,
+    "scriptCount": 4,
+    "document": 18742,
+    "font": 0,
+    "fontCount": 0,
+    "stylesheet": 16419,
+    "stylesheetCount": 1,
+    "thirdParty": 1223044,
+    "thirdPartyCount": 59
+  },
+  "run": {
+    "number": 3,
+    "total": 3
+  },
+  "sidequests": {
+    "-weight.total": 8,
+    "+weight.total": 1,
+    "-weight.document": 8,
+    "+weight.document": 1,
+    "-weight.script": 8,
+    "+weight.script": 1,
+    "-weight.image": 3,
+    "+weight.image": 1,
+    "-weight.font": 1,
+    "+weight.font": 1,
+    "+weight.fontCount": 1,
+    "-timeToFirstByte": 3,
+    "-totalBlockingTime": 3,
+    "-largestContentfulPaint": 1
+  },
+  "axe": {
+    "passes": 2744,
+    "violations": 2
+  }
+}
