@@ -4,8 +4,8 @@ module.exports = {
   //  - the file/directory already exists locally
   //  - the file/directory has not been cached yet
   async onPreBuild({ utils }) {
-    await utils.cache.restore('./_data/results-last-runs.json');
-    await utils.cache.restore('./_data/results');
+    //await utils.cache.restore('./_data/results-last-runs.json');
+    //await utils.cache.restore('./_data/results');
   },
   // Cache file/directory for future builds.
   // Does not do anything if:
