@@ -2,6 +2,7 @@ node_modules
 .log
 _site
 package-lock.json
+_data/results-last-runs-new.json
 .env
 .cache
 .DS_Store
